@@ -92,8 +92,19 @@ const server = createServer(async (req, res) => {
                 return res.end("Short URL already exists, choose another URL");
             }
 
-            links[finalShortURL] = originalURL;
+            let finalURL = originalURL;
+
+            if (!finalURL.startsWith("http://") && !finalURL.startsWith("https://")) {
+                finalURL = "https://" + finalURL;
+            }
+
+            links[finalShortURL] = finalURL;
+
+
+            //links[finalShortURL] = originalURL;
             await saveLinks(links);
+
+
 
             res.writeHead(200, { "Content-Type": "application/json" });
             res.end(JSON.stringify({ success: true, shortURL: finalShortURL }));
