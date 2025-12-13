@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <svg class="bg-svg" viewBox="0 0 1440 320" preserveAspectRatio="none">
+        <path fill="#b7f7cc" fill-opacity="0.6"
+            d="M0,160L80,170.7C160,181,320,203,480,208C640,213,800,203,960,176C1120,149,1280,107,1360,85.3L1440,64L1440,0L1360,0L1280,0L1120,0L960,0L800,0L640,0L480,0L320,0L160,0L0,0Z">
+        </path>
+    </svg>
+
+    <button id="theme-toggle" class="theme-toggle">🌙</button>
+
+    <div class="container">
+        <h1>🔗 URL Shortener</h1>
+
+        <form id="shorten-form" style="margin-bottom: 50px;">
+            <div class="input-group">
+                <label>Enter URL</label>
+                <input type="url" name="url" id="url" required>
+            </div>
+
+            <div class="input-group">
+                <label>Enter Short URL</label>
+                <input type="text" name="shortUrl" id="shortUrl" required>
+            </div>
+
+            <button type="submit">Shorten</button>
+        </form>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const fetchShortenedUrls = async () => {
+            try {
+                const response = await fetch("/links");
+
+                if (response.ok) {
+                    const links = await response.json();
+                    console.log(links);
+
+                    const resultDiv = document.getElementById("result");
+                    resultDiv.innerHTML = "";
+
+                    for (const shortURL in links) {
+                        const originalURL = links[shortURL];
+                        const fullShortURL = `${window.location.origin}/${shortURL}`;
+
+                        resultDiv.innerHTML += `
+                        <div class="result-row">
+                            <div class="url-pair">
+                                <a href="${originalURL}" target="_blank" class="url-original">
+                                ${originalURL}
+                            </a>
+                            <span class="arrow">→</span>
+                            <a href="${fullShortURL}" target="_blank" class="url-short">
+                                ${fullShortURL}
+                            </a>
+                            </div>
+                            <button class="copy-btn"  onclick="copyText('${fullShortURL}')">
+                                📋
+                            </button>
+                        </div>
+                        `;
+
+                    }
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        }
+
+        document.getElementById('shorten-form').addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            const formElement = document.getElementById("shorten-form");
+            const formData = new FormData(formElement);
+            const url = formData.get("url");
+            const ShortUrl = formData.get("shortUrl");
+
+            try {
+                const response = await fetch("/shorten", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ originalURL: url, shortURL: ShortUrl })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    alert("form submitted successfully");
+                    formElement.reset();
+                    fetchShortenedUrls();
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        });
+
+        fetchShortenedUrls();
+
+
+        const toggleBtn = document.getElementById("theme-toggle");
+        toggleBtn.addEventListener("click", () => {
+            document.body.classList.toggle("dark");
+            toggleBtn.textContent =
+                document.body.classList.contains("dark") ? "🌞" : "🌙";
+        });
+
+        function copyText(text) {
+            navigator.clipboard.writeText(text);
+            alert("Copied to clipboard!");
+        }
+
+    </script>
+</body>
+</html>
