@@ -85,12 +85,9 @@ const server = createServer(async (req, res) => {
                 return res.end("URL is required");
             }
 
-            const finalShortURL = shortURL || crypto.randomBytes(4).toString("hex");
-
-            if (links[finalShortURL]) {
-                res.writeHead(404, { "Content-Type": "text/html" });
-                return res.end("Short URL already exists, choose another URL");
-            }
+            const finalShortURL = (shortURL || crypto.randomBytes(4).toString("hex"))
+                .trim()
+                .replace(/\s+/g, "-");
 
             let finalURL = originalURL;
 
@@ -98,16 +95,18 @@ const server = createServer(async (req, res) => {
                 finalURL = "https://" + finalURL;
             }
 
+            if (links[finalShortURL]) {
+                res.writeHead(409, { "Content-Type": "text/plain" });
+                return res.end("Short URL already exists");
+            }
+
             links[finalShortURL] = finalURL;
-
-
-            //links[finalShortURL] = originalURL;
             await saveLinks(links);
-
-
 
             res.writeHead(200, { "Content-Type": "application/json" });
             res.end(JSON.stringify({ success: true, shortURL: finalShortURL }));
+
+
         });
     }
 });
