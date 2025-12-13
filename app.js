@@ -4,7 +4,8 @@ import path from "path";
 import crypto from "crypto";
 
 
-const port = 3000;
+const port = process.env.PORT || 3000;
+
 const DATA_FILE = path.join("data", "links.json");
 
 // serverFile now accepts req/res
@@ -100,6 +101,7 @@ const server = createServer(async (req, res) => {
     }
 });
 
-server.listen(port, () => {
-    console.log(`Server is running at http://localhost:${port}`);
+server.listen(port, "0.0.0.0", () => {
+    console.log(`Server is running on port ${port}`);
 });
+
