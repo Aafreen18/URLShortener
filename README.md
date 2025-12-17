@@ -8,14 +8,14 @@ It allows users to shorten long URLs and redirect to the original links using sh
 ## 📁 Project Structure
 
 URLShortener/
-├── data/
-│   └── links.json    # Persistent storage for URL mappings
-├── public/
-│   ├── index.html    # Clean, responsive frontend
-│   └── style.css     # Custom styling for the interface
-├── app.js            # Core Express server and logic
-├── package.json      # Node.js dependencies and scripts
-└── README.md         # Project documentation
+|-- data/
+|   `-- links.json
+|-- public/
+|   |-- index.html
+|   `-- style.css
+|-- app.js
+|-- package.json
+`-- README.md
 
 ---
 
